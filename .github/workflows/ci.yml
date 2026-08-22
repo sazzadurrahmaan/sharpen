@@ -59,20 +59,43 @@ jobs:
           done
           exit "$bad"
 
-      - name: SKILL.md has required frontmatter
+      - name: SKILL.md conforms to the Agent Skills spec
         run: |
-          f=plugins/sharpen/skills/sharpen/SKILL.md
-          head -1 "$f" | grep -qx -- '---' || { echo "::error::$f must start with ---"; exit 1; }
-          grep -qm1 '^name: sharpen$' "$f" || { echo "::error::missing name"; exit 1; }
-          grep -qm1 '^description: ' "$f" || { echo "::error::missing description"; exit 1; }
-          echo "ok  frontmatter"
-
-      - name: SKILL.md stays lean
-        run: |
-          f=plugins/sharpen/skills/sharpen/SKILL.md
-          n=$(wc -l < "$f")
-          echo "SKILL.md is $n lines"
-          [ "$n" -le 160 ] || { echo "::error::SKILL.md is $n lines, limit is 160. Move material to references/."; exit 1; }
+          python3 - <<'PY'
+          import re, sys, pathlib
+          d = pathlib.Path("plugins/sharpen/skills/sharpen")
+          t = (d / "SKILL.md").read_text()
+          errs = []
+          if not t.startswith("---\n"):
+              errs.append("SKILL.md must open with YAML frontmatter")
+          fm = t.split("---", 2)[1] if t.startswith("---\n") else ""
+          def field(k):
+              m = re.search(rf"^{k}: (.+)$", fm, re.M)
+              return m.group(1).strip() if m else None
+          name, desc = field("name"), field("description")
+          if not name:
+              errs.append("frontmatter is missing required field: name")
+          else:
+              if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name) or len(name) > 64:
+                  errs.append(f"name {name!r} breaks the spec (lowercase, digits, single hyphens, <=64 chars)")
+              if name != d.name:
+                  errs.append(f"name {name!r} must match the parent directory {d.name!r}")
+          if not desc:
+              errs.append("frontmatter is missing required field: description")
+          elif len(desc) > 1024:
+              errs.append(f"description is {len(desc)} chars, spec limit is 1024")
+          allowed = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+          extra = {k for k in re.findall(r"^([a-zA-Z][\w-]*):", fm, re.M)} - allowed
+          if extra:
+              errs.append(f"non-spec frontmatter fields break portability: {sorted(extra)}")
+          n = len(t.splitlines())
+          if n > 500:
+              errs.append(f"SKILL.md is {n} lines, spec recommends under 500")
+          for e in errs:
+              print(f"::error::{e}")
+          print("ok       SKILL.md conforms" if not errs else "")
+          sys.exit(1 if errs else 0)
+          PY
 
       - name: Shell scripts pass shellcheck
         run: shellcheck scripts/*.sh

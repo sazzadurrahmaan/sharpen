@@ -2,7 +2,7 @@
 
 <p align="center">
   <b>Turn a messy request into a prompt your coding agent gets right the first time.</b><br>
-  One skill. Works in Claude Code, Cursor, Codex, or any agent that reads a markdown file.
+  One <a href="https://agentskills.io">Agent Skills</a> folder — Codex, Claude Code, Cursor, Gemini CLI, Copilot, and 40+ more.
 </p>
 
 <p align="center">
@@ -42,44 +42,68 @@ The agent stops guessing that it's the session. It goes and looks.
 
 ## Install
 
-### Claude Code — plugin (recommended)
+sharpen is an [Agent Skills](https://agentskills.io) skill — an open standard
+supported by Codex, Claude Code, Cursor, Gemini CLI, Copilot, Amp, OpenCode, Goose,
+Kiro, Roo Code, and [40+ other agents](https://agentskills.io/clients). One folder,
+no per-tool ports.
+
+**One command, every agent:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/main/scripts/install.sh | bash
+```
+
+Installs to `~/.agents/skills/sharpen` (the standard location) and links
+`~/.claude/skills/sharpen` for Claude Code. Restart your agent, then:
+
+| Agent | Invoke |
+| --- | --- |
+| Codex | `$sharpen <your messy prompt>` |
+| Claude Code | `/sharpen <your messy prompt>` |
+| Cursor | `/sharpen` in Agent chat |
+| Everything else | activates on its own when you ask to fix a prompt |
+
+### Manual
+
+```bash
+git clone https://github.com/sazzadurrahmaan/sharpen.git
+mkdir -p ~/.agents/skills
+cp -r sharpen/plugins/sharpen/skills/sharpen ~/.agents/skills/sharpen
+```
+
+Claude Code reads `~/.claude/skills/` rather than the standard path, so also:
+
+```bash
+ln -s ~/.agents/skills/sharpen ~/.claude/skills/sharpen
+```
+
+### Per-project
+
+Commit it so your whole team gets it:
+
+```bash
+mkdir -p .agents/skills
+cp -r /path/to/sharpen/plugins/sharpen/skills/sharpen .agents/skills/sharpen
+```
+
+### Claude Code plugin
+
+If you'd rather manage it as a plugin than a loose folder:
 
 ```
 /plugin marketplace add sazzadurrahmaan/sharpen
 /plugin install sharpen@sharpen
 ```
 
-### Claude Code — one-liner
+### Agents without skill support
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/main/scripts/install.sh | bash
-```
+ChatGPT custom GPTs, raw system prompts, Aider, older Windsurf/Cline: paste
+[`dist/sharpen.md`](dist/sharpen.md) into the instruction field. It is the whole
+skill flattened into one file with no external references.
 
-### Claude Code — manual
-
-```bash
-git clone https://github.com/sazzadurrahmaan/sharpen.git
-cp -r sharpen/plugins/sharpen/skills/sharpen ~/.claude/skills/sharpen
-```
-
-Restart Claude Code. Then:
-
-```
-/sharpen fix the checkout thing its been broken since friday
-```
-
-### Cursor
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/main/adapters/cursor/rules/sharpen.mdc \
-  -o ~/.cursor/rules/sharpen.mdc
-```
-
-### Codex, Windsurf, Cline, Aider, ChatGPT, anything else
-
-Copy [`dist/sharpen.md`](dist/sharpen.md) into your agent's instruction file
-(`AGENTS.md`, `.windsurfrules`, `.clinerules`, a custom GPT, a system prompt — it is
-a plain markdown file with no tool dependencies).
+For Cursor before 2.4 (rules, not skills), use
+[`adapters/cursor/rules/sharpen.mdc`](adapters/cursor/rules/sharpen.mdc). On 2.4+
+the skill install above is the better path.
 
 ---
 
@@ -140,8 +164,12 @@ scripts/build.sh                     regenerates both
 
 `SKILL.md` stays short on purpose — a skill body costs context every time it loads.
 The long material sits in `references/` and is read only when the task needs it.
-That is [progressive disclosure](https://code.claude.com/docs/en/skills), and it is
-the whole reason this is a skill instead of a 3,000-word CLAUDE.md block.
+That is [progressive disclosure](https://agentskills.io/specification#progressive-disclosure),
+and it is the whole reason this is a skill instead of a 3,000-word instructions block.
+
+The frontmatter uses only the six fields in the
+[Agent Skills spec](https://agentskills.io/specification) — no vendor extensions —
+which is why the same folder loads in every client without a port. CI enforces it.
 
 After editing anything under `plugins/`, run:
 
