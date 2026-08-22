@@ -53,8 +53,16 @@ no per-tool ports.
 curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/main/scripts/install.sh | bash
 ```
 
+Pin to a release instead of tracking `main`:
+
+```bash
+SHARPEN_REF=v1.1.1 curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/v1.1.1/scripts/install.sh | bash
+```
+
 Installs to `~/.agents/skills/sharpen` (the standard location) and links
-`~/.claude/skills/sharpen` for Claude Code. Restart your agent, then:
+`~/.claude/skills/sharpen` for Claude Code. An existing install that you have
+edited is moved to `sharpen.backup.<timestamp>` rather than overwritten.
+Restart your agent, then:
 
 | Agent | Invoke |
 | --- | --- |
@@ -62,6 +70,28 @@ Installs to `~/.agents/skills/sharpen` (the standard location) and links
 | Claude Code | `/sharpen <your messy prompt>` |
 | Cursor | `/sharpen` in Agent chat |
 | Everything else | activates on its own when you ask to fix a prompt |
+
+<details>
+<summary><b>What you are actually installing</b> — worth checking before piping curl into bash</summary>
+
+Three markdown files and nothing else:
+
+```
+sharpen/
+├── SKILL.md
+└── references/
+    ├── examples.md
+    └── by-task-type.md
+```
+
+No scripts, no executables, no `allowed-tools` grant, no network calls, no
+post-install hooks. The skill is inert text that your agent reads — it cannot run
+anything on your machine. `install.sh` only clones this repo and copies that folder;
+read it first at [`scripts/install.sh`](scripts/install.sh), or use the manual
+install below and skip the script entirely. CI enforces that the skill stays
+executable-free.
+
+</details>
 
 ### Manual
 

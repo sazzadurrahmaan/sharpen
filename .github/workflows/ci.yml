@@ -5,11 +5,16 @@ on:
     branches: [main]
   pull_request:
 
+# CI runs scripts/build.sh from the branch under test, so a pull request executes
+# contributor-authored code. Nothing here needs write access or secrets.
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Generated files are in sync
         run: |
@@ -57,6 +62,26 @@ jobs:
               bad=1
             fi
           done
+          exit "$bad"
+
+      - name: Skill ships no executables
+        run: |
+          bad=0
+          while IFS= read -r f; do
+            case "$f" in
+              *.md) ;;
+              *) echo "::error::skill contains a non-markdown file: $f"; bad=1; continue;;
+            esac
+            if [ -x "$f" ]; then
+              echo "::error::skill file is executable: $f"
+              bad=1
+            fi
+          done < <(find plugins/sharpen/skills/sharpen -type f)
+          if [ -n "$(find plugins/sharpen/skills/sharpen -type l)" ]; then
+            echo "::error::skill contains a symlink"
+            bad=1
+          fi
+          [ "$bad" -eq 0 ] && echo "ok       skill is inert markdown only"
           exit "$bad"
 
       - name: Manifest versions agree
