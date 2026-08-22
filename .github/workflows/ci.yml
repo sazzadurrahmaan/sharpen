@@ -59,6 +59,25 @@ jobs:
           done
           exit "$bad"
 
+      - name: Manifest versions agree
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          mk = json.load(open(".claude-plugin/marketplace.json"))
+          pl = json.load(open("plugins/sharpen/.claude-plugin/plugin.json"))
+          entry = next(p for p in mk["plugins"] if p["name"] == "sharpen")
+          versions = {
+              "plugin.json": pl["version"],
+              "marketplace.json (plugin entry)": entry["version"],
+              "marketplace.json (metadata)": mk["metadata"]["version"],
+          }
+          if len(set(versions.values())) != 1:
+              for k, v in versions.items():
+                  print(f"::error::version mismatch — {k} says {v}")
+              sys.exit(1)
+          print(f"ok       all manifests at {pl['version']}")
+          PY
+
       - name: SKILL.md conforms to the Agent Skills spec
         run: |
           python3 - <<'PY'
