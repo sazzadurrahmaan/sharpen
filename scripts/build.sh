@@ -12,8 +12,8 @@ strip_frontmatter() { awk 'NR==1 && /^---$/ {fm=1; next} fm && /^---$/ {fm=0; ne
 # In the single-file builds there are no separate reference files, so retarget the
 # in-body pointers at the appended sections.
 inline_refs() {
-  sed -e 's|Class-specific guidance lives in `references/by-task-type.md` — read that file only|Class-specific guidance is in the "Per-class checklists" section below — read only the part|' \
-      -e 's|^for the class you picked, and only when the task is non-trivial.$|for the class you picked, and only when the task is non-trivial.|'
+  # shellcheck disable=SC2016  # backticks below are literal text in the sed pattern, not a subshell
+  sed 's|Class-specific guidance lives in `references/by-task-type.md` — read that file only|Class-specific guidance is in the "Per-class checklists" section below — read only the part|'
 }
 
 # --- dist/sharpen.md : paste into any agent, or save as AGENTS.md ---
