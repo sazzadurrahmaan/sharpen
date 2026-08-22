@@ -32,8 +32,8 @@ main() {
 
   echo "fetching sharpen${ref:+ @ $ref}..."
   if [ -n "$ref" ]; then
-    git clone --depth 1 --quiet --branch "$ref" "$repo" "$tmp/sharpen" \
-      || die "could not fetch ref '$ref'"
+    git -c advice.detachedHead=false clone --depth 1 --quiet --branch "$ref" \
+      "$repo" "$tmp/sharpen" || die "could not fetch ref '$ref'"
   else
     git clone --depth 1 --quiet "$repo" "$tmp/sharpen"
   fi
