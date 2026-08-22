@@ -1,0 +1,14 @@
+{
+  "name": "sharpen",
+  "displayName": "Sharpen",
+  "version": "1.0.0",
+  "description": "Rewrite rough, rambling, or vague requests into concise, execution-ready prompts for coding agents.",
+  "author": {
+    "name": "Sazzadur Rahman",
+    "url": "https://github.com/sazzadurrahmaan"
+  },
+  "homepage": "https://github.com/sazzadurrahmaan/sharpen",
+  "repository": "https://github.com/sazzadurrahmaan/sharpen",
+  "license": "MIT",
+  "keywords": ["prompt", "prompt-engineering", "productivity", "code-review", "debugging"]
+}

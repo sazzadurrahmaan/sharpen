@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generated files are in sync
+        run: |
+          ./scripts/build.sh
+          if ! git diff --quiet -- dist adapters; then
+            echo "::error::dist/ or adapters/ is stale. Run ./scripts/build.sh and commit."
+            git --no-pager diff --stat -- dist adapters
+            exit 1
+          fi
+
+      - name: Manifests are valid JSON
+        run: |
+          for f in .claude-plugin/marketplace.json plugins/sharpen/.claude-plugin/plugin.json; do
+            python3 -c "import json,sys; json.load(open('$f'))" && echo "ok  $f"
+          done
+
+      - name: SKILL.md has required frontmatter
+        run: |
+          f=plugins/sharpen/skills/sharpen/SKILL.md
+          head -1 "$f" | grep -qx -- '---' || { echo "::error::$f must start with ---"; exit 1; }
+          grep -qm1 '^name: sharpen$' "$f" || { echo "::error::missing name"; exit 1; }
+          grep -qm1 '^description: ' "$f" || { echo "::error::missing description"; exit 1; }
+          echo "ok  frontmatter"
+
+      - name: SKILL.md stays lean
+        run: |
+          f=plugins/sharpen/skills/sharpen/SKILL.md
+          n=$(wc -l < "$f")
+          echo "SKILL.md is $n lines"
+          [ "$n" -le 160 ] || { echo "::error::SKILL.md is $n lines, limit is 160. Move material to references/."; exit 1; }
+
+      - name: Shell scripts pass shellcheck
+        run: shellcheck scripts/*.sh
