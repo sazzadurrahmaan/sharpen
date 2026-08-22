@@ -20,11 +20,44 @@ jobs:
             exit 1
           fi
 
+      - name: Required files exist
+        run: |
+          missing=0
+          while read -r f; do
+            [ -n "$f" ] || continue
+            if [ -e "$f" ]; then
+              echo "ok       $f"
+            else
+              echo "::error::required file is missing: $f"
+              missing=1
+            fi
+          done <<'FILES'
+          .claude-plugin/marketplace.json
+          plugins/sharpen/.claude-plugin/plugin.json
+          plugins/sharpen/skills/sharpen/SKILL.md
+          plugins/sharpen/skills/sharpen/references/examples.md
+          plugins/sharpen/skills/sharpen/references/by-task-type.md
+          dist/sharpen.md
+          adapters/cursor/rules/sharpen.mdc
+          scripts/build.sh
+          scripts/install.sh
+          README.md
+          LICENSE
+          FILES
+          exit "$missing"
+
       - name: Manifests are valid JSON
         run: |
+          bad=0
           for f in .claude-plugin/marketplace.json plugins/sharpen/.claude-plugin/plugin.json; do
-            python3 -c "import json,sys; json.load(open('$f'))" && echo "ok  $f"
+            if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "ok       $f"
+            else
+              echo "::error::$f is missing or not valid JSON"
+              bad=1
+            fi
           done
+          exit "$bad"
 
       - name: SKILL.md has required frontmatter
         run: |
