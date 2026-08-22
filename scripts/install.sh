@@ -82,7 +82,8 @@ preserve() {
   [ -e "$target" ] || [ -L "$target" ] || return 0
   # a symlink is our own doing from a previous run; nothing of the user's inside it
   if [ -L "$target" ]; then rm -f "$target"; return 0; fi
-  local backup="$target.backup.$(date +%Y%m%d%H%M%S)"
+  local backup
+  backup="$target.backup.$(date +%Y%m%d%H%M%S)"
   mv "$target" "$backup"
   echo "moved      existing install to $backup"
 }
