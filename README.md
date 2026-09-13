@@ -56,7 +56,7 @@ curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/main/script
 Pin to a release instead of tracking `main`:
 
 ```bash
-SHARPEN_REF=v1.2.0 curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/v1.2.0/scripts/install.sh | bash
+SHARPEN_REF=v1.2.1 curl -fsSL https://raw.githubusercontent.com/sazzadurrahmaan/sharpen/v1.2.1/scripts/install.sh | bash
 ```
 
 Installs to `~/.agents/skills/sharpen` (the standard location) and links

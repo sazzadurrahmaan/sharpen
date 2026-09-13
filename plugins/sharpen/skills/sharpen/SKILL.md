@@ -104,24 +104,39 @@ patterns; avoid unnecessary duplication and unnecessary abstraction."
 
 ### 5. Attach skills
 
-Always end the prompt with a `## Skills` section. List the skills the executing
-agent must invoke, in order, before reading or changing anything. Pick from the
-skills listed in the current session only — never invent a name.
+Always end the prompt with a `## Skills` section: the skills the executing agent
+must invoke, in order, before reading or changing anything.
 
-- One process skill first, chosen by class: bug fix / debugging →
-  `superpowers:systematic-debugging`; feature / refactor →
-  `superpowers:brainstorming` (skip for a trivial change) then
-  `superpowers:test-driven-development`; code review → `code-review` or
-  `strict-review`; review-feedback resolution → `respond-to-pr-review`.
-- Then domain skills that match the files or stack the task touches, e.g.
-  `inertia-vue-development`, `tailwindcss-development`, `pest-testing`,
-  `laravel-best-practices`, `chrome-devtools-mcp:chrome-devtools` or
-  `claude-in-chrome` for browser verification. Project-specific skills win
-  over generic ones.
-- End with `superpowers:verification-before-completion`.
+**Select dynamically, every time.** Read the skill list available in the current
+session (the "available skills" listing, plugin skills, project `.claude/skills/`)
+and match each skill's description against what the task actually touches. Never
+use a fixed mapping, never invent a name, never list a skill that is not offered
+in this session.
 
-Format each entry as `- skill-name — one-line reason`. Three to five entries is
-normal; do not pad. When the user later says "run", invoke every listed skill in
+Walk it in this order:
+
+1. **Process skill** — one, chosen by the class from step 1. Debugging or a bug
+   fix wants a root-cause skill (e.g. `superpowers:systematic-debugging`); a
+   feature or refactor wants design-then-test skills (e.g.
+   `superpowers:brainstorming` for non-trivial scope, then
+   `superpowers:test-driven-development`); a review wants the review skill; PR
+   feedback wants the respond-to-review skill. Skip brainstorming for a change
+   that is obviously small.
+2. **Domain skills** — scan the descriptions for the nouns in the task: the
+   stack (Laravel, Vue, Inertia, Tailwind, Pest…), the surface (UI/UX, API,
+   billing, auth, queues, browser…), the artifact (screenshot, PR, release…).
+   A UI or visual task pulls in the design and styling skills on offer (e.g.
+   `frontend-design`, `ui-ux-pro-max:ui-styling`, `tailwindcss-development`,
+   `inertia-vue-development`) plus a browser skill for visual verification. A
+   backend task pulls in the framework and testing skills. A billing, auth, or
+   other project-specific area pulls in that project's own skill first —
+   project skills outrank generic ones.
+3. **Verification skill** — end with the session's completion-check skill (e.g.
+   `superpowers:verification-before-completion`).
+
+Format each entry as `- skill-name — one-line reason tied to this task`. Three
+to six entries is normal; do not pad, and drop any skill whose reason you cannot
+state in one line. When the user later says "run", invoke every listed skill in
 that order before starting the work.
 
 ### 6. Gate
