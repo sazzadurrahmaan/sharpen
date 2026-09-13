@@ -78,6 +78,9 @@ Include only the sections the task needs. Simple tasks get no headings at all.
 
 ## Verify
 <how correctness is demonstrated>
+
+## Skills
+<skills to invoke, in order, before any other action>
 ```
 
 Default clauses, used only where they earn their place:
@@ -96,7 +99,29 @@ One strong instruction beats five overlapping ones. `Make it clean / reusable /
 DRY / organized / best practice` collapses into: "Follow the project's existing
 patterns; avoid unnecessary duplication and unnecessary abstraction."
 
-### 5. Gate
+### 5. Attach skills
+
+Always end the prompt with a `## Skills` section. List the skills the executing
+agent must invoke, in order, before reading or changing anything. Pick from the
+skills listed in the current session only — never invent a name.
+
+- One process skill first, chosen by class: bug fix / debugging →
+  `superpowers:systematic-debugging`; feature / refactor →
+  `superpowers:brainstorming` (skip for a trivial change) then
+  `superpowers:test-driven-development`; code review → `code-review` or
+  `strict-review`; review-feedback resolution → `respond-to-pr-review`.
+- Then domain skills that match the files or stack the task touches, e.g.
+  `inertia-vue-development`, `tailwindcss-development`, `pest-testing`,
+  `laravel-best-practices`, `chrome-devtools-mcp:chrome-devtools` or
+  `claude-in-chrome` for browser verification. Project-specific skills win
+  over generic ones.
+- End with `superpowers:verification-before-completion`.
+
+Format each entry as `- skill-name — one-line reason`. Three to five entries is
+normal; do not pad. When the user later says "run", invoke every listed skill in
+that order before starting the work.
+
+### 6. Gate
 
 The sharpened prompt ships only when an experienced agent could answer all of:
 
@@ -107,6 +132,7 @@ The sharpened prompt ships only when an experienced agent could answer all of:
 5. What must stay unchanged?
 6. Which claims are uncertain?
 7. How is correctness verified?
+8. Which skills must be loaded first?
 
 Any gap: pull it from the user's text if present, or tell the agent to investigate
 it. Ask the user **only** when the answer is undiscoverable and would materially
@@ -116,6 +142,10 @@ change the implementation — one question, not a questionnaire.
 
 Emit the sharpened prompt in a fenced code block, nothing before it, and no
 explanation of what you changed. Then one line offering to run it.
+
+When the user answers "run" (or "go", "do it"): invoke each skill in the
+`## Skills` section in order via the Skill tool, then execute the prompt. Do not
+ask which skills to use — the list is the answer.
 
 If a genuine blocking ambiguity exists, ask the single question first and stop.
 
@@ -278,10 +308,17 @@ correct fix following the existing auth patterns.
 
 Verify: a login attempt that previously failed now succeeds, and existing
 authenticated routes and logout still work.
+
+## Skills
+- superpowers:systematic-debugging — root cause before any fix
+- fortify-development — auth flow lives in Fortify
+- pest-testing — regression test for the failing login
+- superpowers:verification-before-completion — prove it before claiming done
 ```
 
 Why: "I think it's X" became a hypothesis, not a premise. "Don't break anything"
-became a concrete regression check. "Properly" was noise.
+became a concrete regression check. "Properly" was noise. The Skills list makes
+"run" self-contained: the executor loads them in order without being asked.
 
 ---
 

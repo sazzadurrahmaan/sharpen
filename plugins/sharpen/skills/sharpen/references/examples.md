@@ -26,10 +26,17 @@ correct fix following the existing auth patterns.
 
 Verify: a login attempt that previously failed now succeeds, and existing
 authenticated routes and logout still work.
+
+## Skills
+- superpowers:systematic-debugging — root cause before any fix
+- fortify-development — auth flow lives in Fortify
+- pest-testing — regression test for the failing login
+- superpowers:verification-before-completion — prove it before claiming done
 ```
 
 Why: "I think it's X" became a hypothesis, not a premise. "Don't break anything"
-became a concrete regression check. "Properly" was noise.
+became a concrete regression check. "Properly" was noise. The Skills list makes
+"run" self-contained: the executor loads them in order without being asked.
 
 ---
 
