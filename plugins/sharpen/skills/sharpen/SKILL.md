@@ -61,7 +61,8 @@ becomes
 
 ### 4. Write the prompt
 
-Include only the sections the task needs. Simple tasks get no headings at all.
+Include only the sections the task needs. Simple tasks get no other headings;
+`## Standards` and `## Skills` are always present, even then.
 
 ```
 ## Task
@@ -82,6 +83,9 @@ Include only the sections the task needs. Simple tasks get no headings at all.
 ## Verify
 <how correctness is demonstrated>
 
+## Standards
+<the fixed engineering bar — always present, see below>
+
 ## Skills
 <skills to invoke, in order, before any other action>
 ```
@@ -98,9 +102,26 @@ Default clauses, used only where they earn their place:
   callers and preserve behavior outside the requested change. It does not mean
   "never touch existing code."
 
-One strong instruction beats five overlapping ones. `Make it clean / reusable /
-DRY / organized / best practice` collapses into: "Follow the project's existing
-patterns; avoid unnecessary duplication and unnecessary abstraction."
+One strong instruction beats five overlapping ones. Vague quality words in the
+user's text (`clean / reusable / DRY / organized / best practice`) are already
+covered by the Standards block — do not restate them elsewhere in the prompt.
+
+**Standards block — always emitted, verbatim, as the `## Standards` section.**
+This is the engineering bar every sharpened prompt carries, whatever the task:
+
+```
+## Standards
+- Keep the result organized and optimized; no dead code, no leftovers.
+- Do not damage any existing feature — check callers and preserve behavior outside the change.
+- Follow industry-standard best practices for this stack.
+- Reuse existing code, files, and abstractions; never duplicate logic.
+- Follow the codebase's existing patterns and conventions.
+- Comments: one line max, only on genuinely important parts, short words.
+- No unnecessary change — nothing outside what the task needs.
+```
+
+Do not paraphrase, reorder, or trim it. Task-specific constraints go in
+`## Constraints`; the Standards block stays generic and fixed.
 
 ### 5. Attach skills
 
@@ -151,6 +172,7 @@ The sharpened prompt ships only when an experienced agent could answer all of:
 6. Which claims are uncertain?
 7. How is correctness verified?
 8. Which skills must be loaded first?
+9. Is the Standards block present and unedited?
 
 Any gap: pull it from the user's text if present, or tell the agent to investigate
 it. Ask the user **only** when the answer is undiscoverable and would materially
@@ -173,7 +195,8 @@ If a genuine blocking ambiguity exists, ask the single question first and stop.
 - Adding "write tests, add error handling, update the docs" when the user asked for
   none of it.
 - Prescribing files and function names the user never mentioned.
-- Restating a rule in three sections.
+- Restating a rule in three sections (the Standards block already covers quality;
+  do not echo it in Requirements or Constraints).
 - Padding a trivial task with headings.
 
 ## More

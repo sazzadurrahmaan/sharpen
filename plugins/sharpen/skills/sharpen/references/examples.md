@@ -27,6 +27,15 @@ correct fix following the existing auth patterns.
 Verify: a login attempt that previously failed now succeeds, and existing
 authenticated routes and logout still work.
 
+## Standards
+- Keep the result organized and optimized; no dead code, no leftovers.
+- Do not damage any existing feature — check callers and preserve behavior outside the change.
+- Follow industry-standard best practices for this stack.
+- Reuse existing code, files, and abstractions; never duplicate logic.
+- Follow the codebase's existing patterns and conventions.
+- Comments: one line max, only on genuinely important parts, short words.
+- No unnecessary change — nothing outside what the task needs.
+
 ## Skills
 - superpowers:systematic-debugging — root cause before any fix
 - fortify-development — auth flow lives in Fortify
@@ -35,8 +44,9 @@ authenticated routes and logout still work.
 ```
 
 Why: "I think it's X" became a hypothesis, not a premise. "Don't break anything"
-became a concrete regression check. "Properly" was noise. The Skills list makes
-"run" self-contained: the executor loads them in order without being asked.
+became a concrete regression check. "Properly" was noise. The Standards block is
+fixed and always present; the Skills list makes "run" self-contained: the
+executor loads them in order without being asked.
 
 ---
 
