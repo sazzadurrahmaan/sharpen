@@ -43,6 +43,21 @@ Drop greetings, filler, repetition, frustration, self-explanation, and generic
 engineering advice. Keep every concrete token: file paths, symbol names, routes,
 error strings, branch names, PR numbers, version numbers, URLs.
 
+**Attachments survive sharpening — always.** Anything the user attached or pointed
+at alongside the raw prompt is part of the prompt: images/screenshots, file paths,
+links, PR/issue numbers, log excerpts. The sharpened prompt must carry every one of
+them forward explicitly:
+
+- Images/screenshots: reference each one positionally in the prompt text — "the
+  attached screenshot" / "attached image #2 (the error state)" — and say what it
+  shows if the user said so. Never silently omit an attached image; the executing
+  agent will receive it alongside the sharpened text.
+- File paths, URLs, links: copy verbatim into the `References` / `Context` section,
+  character for character. Never paraphrase a path or shorten a URL.
+- If the raw prompt's meaning depends on an attachment ("fix this: <screenshot>"),
+  the sharpened prompt must state that dependency: "See the attached screenshot for
+  the broken state."
+
 ### 3. Never invent
 
 Do not add requirements, features, APIs, files, dependencies, acceptance criteria,
@@ -183,6 +198,9 @@ change the implementation — one question, not a questionnaire.
 Emit the sharpened prompt in a fenced code block, nothing before it, and no
 explanation of what you changed. Then one line offering to run it.
 
+Before emitting, check: every attachment, file path, and link from the raw prompt
+appears in the sharpened prompt. If even one is missing, the output is wrong.
+
 When the user answers "run" (or "go", "do it"): invoke each skill in the
 `## Skills` section in order via the Skill tool, then execute the prompt. Do not
 ask which skills to use — the list is the answer.
@@ -191,6 +209,7 @@ If a genuine blocking ambiguity exists, ask the single question first and stop.
 
 ## Anti-patterns
 
+- Dropping an attached image, file path, or link from the sharpened prompt.
 - Turning a one-line request into a 400-word specification.
 - Adding "write tests, add error handling, update the docs" when the user asked for
   none of it.
